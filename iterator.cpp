@@ -1,5 +1,6 @@
 #include "include/iterator.hpp"
 #include "include/exception.hpp"
+#include <stddef.h>
 
 template <class T>
 Smart_Iterator<T>::Smart_Iterator() {
@@ -23,16 +24,16 @@ unsigned Smart_Iterator<T>::size() const {
 
 template <class T>
 T& Smart_Iterator<T>::operator*() {
-    if (p < begin || p >= end)
+    if (ptr < begin || ptr >= end)
         throw Out_of_range();
-    return *p;
+    return *ptr;
 }
 
 template <class T>
 T* Smart_Iterator<T>::operator->() {
-    if (p < begin || p >= end)
+    if (ptr < begin || ptr >= end)
         throw Out_of_range();
-    return p;
+    return ptr;
 }
 
 template <class T>
@@ -68,7 +69,7 @@ bool Smart_Iterator<T>::operator!=(const Smart_Iterator<T>& s) {
 
 template <class T>
 bool Smart_Iterator<T>::operator>=(const Smart_Iterator<T>& s) {
-    return ptr >!= s.ptr;   
+    return ptr >= s.ptr;   
 }
 
 template <class T>
