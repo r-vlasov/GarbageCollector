@@ -9,7 +9,7 @@
 
 template <class T, int size = 0>
 class Smart_ptr {
-    static list<Info<T> > gclist;
+    static std::list<Info<T> > gclist;
     T* addr;
     unsigned length; // if it is a array -> size of array, else size = 1;
     union {
@@ -25,7 +25,7 @@ public:
     Smart_ptr& operator= (Smart_ptr<T, size> &rv);
     ~Smart_ptr(); // destructor;
 
-    list<Info<T> >::iterator findInfoInList(T* ptr);
+    typename std::list<Info<T> >::iterator findInfoInList(T* ptr);
 
     T& operator* ();
     T* operator->();

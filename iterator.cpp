@@ -25,14 +25,14 @@ unsigned Smart_Iterator<T>::size() const {
 template <class T>
 T& Smart_Iterator<T>::operator*() {
     if (ptr < begin || ptr >= end)
-        throw Out_of_range();
+       // throw Out_of_range();
     return *ptr;
 }
 
 template <class T>
 T* Smart_Iterator<T>::operator->() {
     if (ptr < begin || ptr >= end)
-        throw Out_of_range();
+       // throw Out_of_range();
     return ptr;
 }
 

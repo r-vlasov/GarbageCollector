@@ -18,3 +18,12 @@ bool Info<T>::operator== (const Info<T>& s) {
     return s.compare(allocmem);
 }
 
+template <class T>
+unsigned Info<T>::getsize() {
+    return size;
+}
+
+template <class T>
+T* Info<T>::getallocmem() {
+    return allocmem;
+}
