@@ -4,14 +4,16 @@
 #include <new>
 
 int function() {
-      Smart_ptr<int> A = new int;
-      std::cout << (unsigned long long)A.getaddr();
+    int *p = new int;
+    int *c = new int;
+    Smart_ptr<int> B[20];
+    Smart_ptr<int> A = new int ;
+    B[0] = p;
+    B[10] = c;
 }
 
-int main() {  
-    Smart_ptr<int> A[20];
-    for (int i = 0; i < 20; i++) {
-      A[i] = new int;
-    }
+int main() { 
     function();
+
+    Smart_ptr<int> C = new int;
 }

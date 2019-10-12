@@ -9,7 +9,6 @@ template <class T> class Info {
 
 public:
     Info(T* mem, unsigned size = 0); 
-    bool compare(T* mem);
     bool operator== (const Info<T>& s); // specially to search in STL list
 
     unsigned getsize() const;
@@ -29,11 +28,6 @@ Info<T>::Info(T* mem, unsigned size) {
         is_array = true;
     else 
         is_array = false;
-}
-
-template <class T>
-bool Info<T>::compare(T* mem) {
-    return mem == allocmem;
 }
 
 template <class T>

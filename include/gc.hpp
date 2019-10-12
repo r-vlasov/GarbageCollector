@@ -24,8 +24,8 @@ public:
 
     // rule of three :)
     Smart_ptr(const Smart_ptr<T, size>& obj); // copy constructor
-    Smart_ptr& operator= (T* value);
-    Smart_ptr& operator= (Smart_ptr<T, size> &rv);
+    Smart_ptr& operator= (T* const value);
+    Smart_ptr& operator= (const Smart_ptr<T, size> &rv);
     ~Smart_ptr(); // destructor;
 
     T& operator* ();
@@ -56,8 +56,9 @@ template <class T, int size>
 Smart_ptr<T, size>::Smart_ptr(T* t) {
     typename std::list<Info<T> >::iterator p;
     p = findInfoInList(t);
-    if (p != gclist.end())
+    if (p != gclist.end()) {
         p->increfcount();
+    }
     else {
         Info<T> obj(t, size);
         gclist.push_front(obj);
@@ -84,16 +85,46 @@ Smart_ptr<T, size>::Smart_ptr(const Smart_ptr<T, size>& obj) {
 }
 
 template <class T, int size>
-Smart_ptr<T, size>& Smart_ptr<T, size>::operator= (T* value) {
+Smart_ptr<T, size>& Smart_ptr<T, size>::operator= (T* const value) {
     typename std::list<Info<T> >::iterator p;
     p = findInfoInList(this->addr);
     if (p != gclist.end()) {
         p->decrefcount();
         p = findInfoInList(value);
-        p->increfcount();
-        this->addr = value;
+        if (p != gclist.end()) {
+            p->increfcount();
+            addr = value;
+        }
+        else {
+            Info<T> obj(value, size);
+            gclist.push_front(obj);
+        }
     }
     else {
+        std::cout << "throw" << std::endl;
+        //throw
+    }
+}
+
+template <class T, int size>
+Smart_ptr<T, size>& Smart_ptr<T, size>::operator= (const Smart_ptr<T, size>& obj) {
+    typename std::list<Info<T> >::iterator p;
+    p = findInfoInList(this->addr);
+    if (p != gclist.end()) {
+        p->decrefcount();
+        p = findInfoInList(obj.getaddr());
+        if (p != gclist.end()) {
+            p->increfcount();
+            addr = obj.getaddr();
+        }
+        else {
+            std::cout << "throw" << std::endl;
+
+            // throw
+        }
+    }
+    else {
+        std::cout << "throw" << std::endl;
         //throw
     }
 }
@@ -132,20 +163,19 @@ bool Smart_ptr<T, size>::garbagecollect() {
                 continue;
             freed = true;
             
-            std::cout << std::endl <<this->gclist.size() << std::endl;
-
             gclist.remove(*p); 
             if(p->getallocmem()) {
                 if (p->getisarray()) {
-                    std::cout << (unsigned long long) p->getallocmem() << std::endl;
-                    std::cout << this->gclist.size() << std::endl;
                     delete[] p->getallocmem();
+                    std::cout << std::endl <<this->gclist.size() << std::endl;
+
                 }
                 else {
-                    delete p->getallocmem();
-                }
+                    delete p->getallocmem();   
+                    std::cout << std::endl <<this->gclist.size() << std::endl;
+                 }
             }
-            break;   
+            break;
         }
     } while (p!= gclist.end());
     return freed;
