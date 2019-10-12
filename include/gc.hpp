@@ -3,7 +3,7 @@
 
 #include <list>
 #include <stddef.h>
-#include "iterator.hpp"
+//#include "iterator.hpp"
 #include "info.hpp"
 #include <iostream>
 
@@ -17,6 +17,9 @@ class Smart_ptr {
         bool check;
     };
 public:
+    // iterator on ptr in list
+    typename std::list<Info<T> >::iterator findInfoInList(T* ptr);
+
     Smart_ptr(T* t = NULL);
 
     // rule of three :)
@@ -25,35 +28,19 @@ public:
     Smart_ptr& operator= (Smart_ptr<T, size> &rv);
     ~Smart_ptr(); // destructor;
 
-    typename std::list<Info<T> >::iterator findInfoInList(T* ptr);
-
     T& operator* ();
     T* operator->();
     T& operator[](int i);
     
     bool garbagecollect();
+        
     T* getaddr() const;
     int getlength() const;
 };
 
+// out class is templated, so we should define this
 template <class T, int size> 
 std::list<Info<T> > Smart_ptr<T, size>::gclist;
-
-template <class T, int size>
-T& Smart_ptr<T, size>::operator* () {
-    return *this;
-}
-
-template <class T, int size>
-T* Smart_ptr<T, size>::operator->() {
-    return this;
-}
-
-template <class T, int size>
-T& Smart_ptr<T, size>::operator[](int i) {
-    return addr[i];
-}
-
 
 template <class T, int size>
 typename std::list<Info<T> >::iterator Smart_ptr<T, size>::findInfoInList(T* t){
@@ -88,8 +75,8 @@ Smart_ptr<T, size>::Smart_ptr(const Smart_ptr<T, size>& obj) {
     typename std::list<Info<T> >::iterator p;
     p = findInfoInList(obj.getaddr());
     p->increfcount();
-    this->addr = obj.getaddr();
-    this->length = obj.getlength();
+    addr = obj.getaddr();
+    length = obj.getlength();
     if (length > 0)
         is_array = true;
     else
@@ -100,11 +87,14 @@ template <class T, int size>
 Smart_ptr<T, size>& Smart_ptr<T, size>::operator= (T* value) {
     typename std::list<Info<T> >::iterator p;
     p = findInfoInList(this->addr);
-    if (p) {
+    if (p != gclist.end()) {
         p->decrefcount();
         p = findInfoInList(value);
         p->increfcount();
         this->addr = value;
+    }
+    else {
+        //throw
     }
 }
 
@@ -118,6 +108,21 @@ Smart_ptr<T, size>::~Smart_ptr() {
 }
 
 template <class T, int size>
+T& Smart_ptr<T, size>::operator* () {
+    return *this;
+}
+
+template <class T, int size>
+T* Smart_ptr<T, size>::operator->() {
+    return this;
+}
+
+template <class T, int size>
+T& Smart_ptr<T, size>::operator[](int i) {
+    return addr[i];
+}
+
+template <class T, int size>
 bool Smart_ptr<T, size>::garbagecollect() {
     typename std::list<Info<T> >::iterator p;
     bool freed = false;
@@ -126,15 +131,17 @@ bool Smart_ptr<T, size>::garbagecollect() {
             if(p->getrefcount() > 0)
                 continue;
             freed = true;
+            
+            std::cout << std::endl <<this->gclist.size() << std::endl;
 
             gclist.remove(*p); 
             if(p->getallocmem()) {
                 if (p->getisarray()) {
-                    std::cout << "del";
+                    std::cout << (unsigned long long) p->getallocmem() << std::endl;
+                    std::cout << this->gclist.size() << std::endl;
                     delete[] p->getallocmem();
                 }
                 else {
-                    std::cout << "del";
                     delete p->getallocmem();
                 }
             }
