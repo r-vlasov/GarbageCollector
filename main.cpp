@@ -1,15 +1,12 @@
 
 #include "include/gc.hpp"
 #include <iostream>
-
+#include <new>
 
 int function() {
-    Smart_ptr<int> p;
-//    std::cout << p;
+      Smart_ptr<int> A = new int;
 }
+
 int main() {
- //   Smart_ptr<int> p;
-
-  //  p = new int;
-
+  function();
 }
