@@ -17,6 +17,7 @@ class Smart_ptr {
         bool is_array;
         bool check;
     };
+
 public:
     // iterator on ptr in list
     typename std::list<Info<T> >::iterator findInfoInList(T* ptr);
@@ -29,6 +30,21 @@ public:
     Smart_ptr& operator= (const Smart_ptr<T, size> &rv);
     ~Smart_ptr(); // destructor;
 
+    // make these statements(operators) deleted so that you cannot call them from the user program
+    Smart_ptr<T, size> operator++() = delete;    // prefix ++
+    Smart_ptr<T, size> operator--() = delete;    // prefix --
+    Smart_ptr<T, size> operator++(int) = delete; // postfix ++
+    Smart_ptr<T, size> operator--(int) = delete; // postfix --
+    Smart_ptr<T, size> operator+ (int n) = delete;
+    Smart_ptr<T, size> operator- (int n) = delete;
+    bool operator!= (const Smart_ptr<T, size>& s) = delete;
+    bool operator>= (const Smart_ptr<T, size>& s) = delete;
+    bool operator<= (const Smart_ptr<T, size>& s) = delete;
+    bool operator== (const Smart_ptr<T, size>& s) = delete;
+    bool operator< (const Smart_ptr<T, size>& s) = delete;
+    bool operator> (const Smart_ptr<T, size>& s) = delete;
+
+    // redefined operators
     T& operator* ();
     T* operator->();
     T& operator[](int i);
@@ -37,6 +53,7 @@ public:
     Smart_Iterator<T> begin();
     Smart_Iterator<T> end();
 
+    // function that collect our garbage (it scans gclist<Info<T>>)
     bool garbagecollect();
         
     T* getaddr() const;

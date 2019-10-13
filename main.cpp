@@ -14,6 +14,7 @@ int function() {
             std::cout << i << " ";
             i+=1;        
         }
+       // if (B > B);
     }
     catch (Smart_iter_exception& exc) {
         std::cout << "hello";
