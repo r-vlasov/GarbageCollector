@@ -6,14 +6,20 @@
 int function() {
     int *p = new int;
     int *c = new int;
-    Smart_ptr<int> B[20];
-    Smart_ptr<int> A = new int ;
-    B[0] = p;
-    B[10] = c;
+    Smart_ptr<int, 30> B;
+
+    try {
+        int i = 0;
+        for (Smart_Iterator<int> iter = B.begin(); iter < B.end(); ++iter) {
+            std::cout << i << " ";
+            i+=1;        
+        }
+    }
+    catch (Smart_iter_exception& exc) {
+        std::cout << "hello";
+    }
 }
 
 int main() { 
     function();
-
-    Smart_ptr<int> C = new int;
 }

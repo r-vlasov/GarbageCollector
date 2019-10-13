@@ -16,6 +16,7 @@ public:
 
 
 class Smart_iter_exception: protected Smart_exception{
+public:
     Smart_iter_exception(const char* str) {
         this->_msg = str;
         std::cout << "Iterator exception: ";
@@ -23,6 +24,7 @@ class Smart_iter_exception: protected Smart_exception{
 };
 
 class Smart_gc_exception : protected Smart_exception{
+public:
     Smart_gc_exception(const char* str)  {
         this->_msg = str;
         std::cout << "GC exception: ";

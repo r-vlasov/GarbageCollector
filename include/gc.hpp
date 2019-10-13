@@ -33,6 +33,10 @@ public:
     T* operator->();
     T& operator[](int i);
     
+    // iterator
+    Smart_Iterator<T> begin();
+    Smart_Iterator<T> end();
+
     bool garbagecollect();
         
     T* getaddr() const;
@@ -102,8 +106,7 @@ Smart_ptr<T, size>& Smart_ptr<T, size>::operator= (T* const value) {
         }
     }
     else {
-        std::cout << "throw" << std::endl;
-        //throw
+        throw Smart_gc_exception("failed to assigned(operator=)");
     }
 }
 
@@ -119,14 +122,11 @@ Smart_ptr<T, size>& Smart_ptr<T, size>::operator= (const Smart_ptr<T, size>& obj
             addr = obj.getaddr();
         }
         else {
-            std::cout << "throw" << std::endl;
-
-            // throw
+            throw Smart_gc_exception("failed to assigned(operator=)");
         }
     }
     else {
-        std::cout << "throw" << std::endl;
-        //throw
+        throw Smart_gc_exception("failed to assigned(operator=)");
     }
 }
 
@@ -151,7 +151,34 @@ T* Smart_ptr<T, size>::operator->() {
 
 template <class T, int size>
 T& Smart_ptr<T, size>::operator[](int i) {
-    return addr[i];
+    if (i >= 0 && i <= length)
+        return addr[i];
+    else
+        throw Smart_gc_exception("Out of range [i]");
+}
+
+template <class T, int size>
+Smart_Iterator<T> Smart_ptr<T,size>::begin() {
+    int _size;
+    if (is_array) { 
+        _size = length;
+    }
+    else {
+        _size = 1;
+    }
+    return Smart_Iterator<T>(addr, addr, addr + _size);
+}
+
+template <class T, int size>
+Smart_Iterator<T> Smart_ptr<T,size>::end() {
+    int _size;
+    if (is_array) { 
+        _size = length;
+    }
+    else {
+        _size = 1;
+    }
+    return Smart_Iterator<T>(addr + _size, addr, addr + _size);
 }
 
 template <class T, int size>
