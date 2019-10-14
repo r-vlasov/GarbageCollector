@@ -67,7 +67,6 @@ public:
     T* getaddr() const;
     int getlength() const;
     void set_gclist_collect_size(unsigned _size);
-    void showlist();
 };
 
 // out class is templated, so we should define this
@@ -77,10 +76,10 @@ std::list<Info<T> > Smart_ptr<T, size>::gclist;
 template <class T, int size>
 void Smart_ptr<T, size>::add_to_gclist(T* data) {
     Info<T> obj(data, size);
+    gclist.push_front(obj);
     if (gclist.size() > gclist_collect_size) {
         garbagecollect();
     }
-    gclist.push_front(obj);
 }
 
 template <class T, int size>
@@ -128,18 +127,16 @@ template <class T, int size>
 Smart_ptr<T, size>& Smart_ptr<T, size>::operator= (T* const value) {
     typename std::list<Info<T> >::iterator p;
     p = findInfoInList(this->addr);
-    if (p != gclist.end()) {
+    if (p != gclist.end()) { 
         p->decrefcount();
-        std::cout << "old qref:" << p->getrefcount() << " ";
         p = findInfoInList(value);
-        std::cout << "new qref:" << p->getrefcount() << " ";
         if (p != gclist.end()) {
             p->increfcount();
-            addr = value;
         }
         else {
             add_to_gclist(value);
         }
+        addr = value;
     }
     else {
         throw Smart_gc_exception("failed to assigned(operator=)");
@@ -231,7 +228,7 @@ bool Smart_ptr<T, size>::garbagecollect() {
             if(p->getallocmem()) {
                 if (p->getisarray()) {
                     delete[] p->getallocmem();
-                    //std::cout << std::endl <<this->gclist.size() << std::endl;
+                    std::cout << std::endl <<this->gclist.size() << std::endl;
 
                 }
                 else {
@@ -259,24 +256,5 @@ template <class T, int size>
 void Smart_ptr<T, size>::set_gclist_collect_size(unsigned _size) {
     gclist_collect_size = _size;
 }
-
-
-template <class T, int size> 
-void Smart_ptr<T, size>::showlist() {  
-    typename std::list<Info<T> >::iterator p;
-    std::cout << "gclist<" << typeid(T).name() << ", "  << size << ">:\n";  
-    std::cout << "memPtr      refcount    value\n";  
-    if(gclist.begin() == gclist.end()) {  
-        std::cout << "           -- Empty --\n\n";  
-        return;  
-    }
-    for(p = gclist.begin(); p != gclist.end(); p++) {  
-        std::cout <<  "[" << (void *)p->getallocmem() << "]"<< "      " << p->getrefcount() << "     ";  
-        if(p->getallocmem()) std::cout << "   " << *p->getallocmem(); 
-        else std::cout << "   ---";  
-        std::cout << std::endl;        
-  }  
-  std::cout << std::endl;  
-}  
 
 #endif

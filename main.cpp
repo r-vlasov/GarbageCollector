@@ -4,21 +4,20 @@
 #include <new>
 
 int function() {
-
-    int *p = new int;
-   // int *d = new int;
     try {
-        Smart_ptr<int> array[20];
-        array->set_gclist_collect_size(20);
-        for (int i = 0; i < 20; i++) {
-            array[i] = new int;
-        }
+        Smart_ptr<int> array;
+        array.set_gclist_collect_size(20);
+        for (int i = 0; i < 100; i++)
+            array = new int;
+        std::cout << "collect";
+        array.garbagecollect();
+        std::cout << "after";
     }
     catch (Smart_iter_exception& exc) {
-        std::cout << "hello";
+        std::cout << "1";
     }
     catch (Smart_gc_exception& exc) {
-        std::cout << "hello";
+        std::cout << "2";
     }
 }
 

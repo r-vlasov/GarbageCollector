@@ -23,7 +23,7 @@ public:
 
 template <class T>
 Info<T>::Info(T* mem, unsigned size) {
-    this->refcount = 0;
+    this->refcount = 1;
     this->allocmem = mem;
     this->size = size;
     if (size > 0)
