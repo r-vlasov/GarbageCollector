@@ -64,6 +64,10 @@ public:
     // function that collect our garbage (it scans gclist<Info<T>>)
     bool garbagecollect();
         
+    // general iterator
+    Smart_Iterator<T> iterator;
+
+    // small functions
     T* getaddr() const;
     int getlength() const;
     void set_gclist_collect_size(unsigned _size);

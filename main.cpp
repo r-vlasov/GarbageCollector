@@ -5,13 +5,14 @@
 
 int function() {
     try {
-        Smart_ptr<int> array;
-        array.set_gclist_collect_size(20);
-        for (int i = 0; i < 100; i++)
-            array = new int;
-        std::cout << "collect";
-        array.garbagecollect();
-        std::cout << "after";
+        Smart_ptr<int, 200> Array = new int[200];
+        Array.iterator = Array.begin();
+        for (Array.iterator;  Array.iterator<Array.end(); ++Array.iterator) {
+            *Array.iterator = 2;
+        }
+        for (int i = 0; i < 200; i++) {
+            std::cout << Array[i];
+        }
     }
     catch (Smart_iter_exception& exc) {
         std::cout << "1";
