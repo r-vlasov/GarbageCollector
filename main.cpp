@@ -4,19 +4,20 @@
 #include <new>
 
 int function() {
-    int *p = new int;
-    int *c = new int;
-    Smart_ptr<int, 30> B;
 
+    int *p = new int;
+   // int *d = new int;
     try {
-        int i = 0;
-        for (Smart_Iterator<int> iter = B.begin(); iter < B.end(); ++iter) {
-            std::cout << i << " ";
-            i+=1;        
+        Smart_ptr<int> array[20];
+        array->set_gclist_collect_size(20);
+        for (int i = 0; i < 20; i++) {
+            array[i] = new int;
         }
-       // if (B > B);
     }
     catch (Smart_iter_exception& exc) {
+        std::cout << "hello";
+    }
+    catch (Smart_gc_exception& exc) {
         std::cout << "hello";
     }
 }

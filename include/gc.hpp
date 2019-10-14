@@ -8,6 +8,8 @@
 #include "info.hpp"
 #include <iostream>
 
+
+#define MAGIC_SIZE 10
 template <class T, int size = 0>
 class Smart_ptr {
     static std::list<Info<T> > gclist;
@@ -18,10 +20,16 @@ class Smart_ptr {
         bool check;
     };
 
-public:
+    // the limit size after which the garbagecollect will be called when trying to increase the size of the gclist 
+    unsigned gclist_collect_size = MAGIC_SIZE;
+
+    // function that add Info object at gclist
+    void add_to_gclist(T* data);
+    
     // iterator on ptr in list
     typename std::list<Info<T> >::iterator findInfoInList(T* ptr);
 
+public:
     Smart_ptr(T* t = NULL);
 
     // rule of three :)
@@ -58,11 +66,22 @@ public:
         
     T* getaddr() const;
     int getlength() const;
+    void set_gclist_collect_size(unsigned _size);
+    void showlist();
 };
 
 // out class is templated, so we should define this
 template <class T, int size> 
 std::list<Info<T> > Smart_ptr<T, size>::gclist;
+
+template <class T, int size>
+void Smart_ptr<T, size>::add_to_gclist(T* data) {
+    Info<T> obj(data, size);
+    if (gclist.size() > gclist_collect_size) {
+        garbagecollect();
+    }
+    gclist.push_front(obj);
+}
 
 template <class T, int size>
 typename std::list<Info<T> >::iterator Smart_ptr<T, size>::findInfoInList(T* t){
@@ -82,8 +101,7 @@ Smart_ptr<T, size>::Smart_ptr(T* t) {
         p->increfcount();
     }
     else {
-        Info<T> obj(t, size);
-        gclist.push_front(obj);
+        add_to_gclist(t);
     }
     addr = t;
     length = size;
@@ -112,14 +130,15 @@ Smart_ptr<T, size>& Smart_ptr<T, size>::operator= (T* const value) {
     p = findInfoInList(this->addr);
     if (p != gclist.end()) {
         p->decrefcount();
+        std::cout << "old qref:" << p->getrefcount() << " ";
         p = findInfoInList(value);
+        std::cout << "new qref:" << p->getrefcount() << " ";
         if (p != gclist.end()) {
             p->increfcount();
             addr = value;
         }
         else {
-            Info<T> obj(value, size);
-            gclist.push_front(obj);
+            add_to_gclist(value);
         }
     }
     else {
@@ -212,7 +231,7 @@ bool Smart_ptr<T, size>::garbagecollect() {
             if(p->getallocmem()) {
                 if (p->getisarray()) {
                     delete[] p->getallocmem();
-                    std::cout << std::endl <<this->gclist.size() << std::endl;
+                    //std::cout << std::endl <<this->gclist.size() << std::endl;
 
                 }
                 else {
@@ -235,5 +254,29 @@ template <class T, int size>
 int Smart_ptr<T, size>::getlength() const {
     return length;
 }
+
+template <class T, int size>
+void Smart_ptr<T, size>::set_gclist_collect_size(unsigned _size) {
+    gclist_collect_size = _size;
+}
+
+
+template <class T, int size> 
+void Smart_ptr<T, size>::showlist() {  
+    typename std::list<Info<T> >::iterator p;
+    std::cout << "gclist<" << typeid(T).name() << ", "  << size << ">:\n";  
+    std::cout << "memPtr      refcount    value\n";  
+    if(gclist.begin() == gclist.end()) {  
+        std::cout << "           -- Empty --\n\n";  
+        return;  
+    }
+    for(p = gclist.begin(); p != gclist.end(); p++) {  
+        std::cout <<  "[" << (void *)p->getallocmem() << "]"<< "      " << p->getrefcount() << "     ";  
+        if(p->getallocmem()) std::cout << "   " << *p->getallocmem(); 
+        else std::cout << "   ---";  
+        std::cout << std::endl;        
+  }  
+  std::cout << std::endl;  
+}  
 
 #endif

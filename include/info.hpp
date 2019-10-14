@@ -8,6 +8,8 @@ template <class T> class Info {
     bool is_array;
 
 public:
+
+    Info() = delete;
     Info(T* mem, unsigned size = 0); 
     bool operator== (const Info<T>& s); // specially to search in STL list
 
