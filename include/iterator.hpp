@@ -26,7 +26,7 @@ public:
     Smart_Iterator<T> operator++();    // prefix ++
     Smart_Iterator<T> operator--();    // prefix --
     Smart_Iterator<T> operator++(int); // postfix ++
-    Smart_Iterator<T> operator--(int); // postfix --
+    Smart_Iterator<T> operator--(int); // pogstix --
     
     bool operator!= (const Smart_Iterator<T>& s);
     bool operator>= (const Smart_Iterator<T>& s);
