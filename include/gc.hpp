@@ -243,6 +243,8 @@ bool Smart_ptr<T, size>::garbagecollect() {
             break;
         }
     } while (p!= gclist.end());
+
+    std::cout << "size: " << gclist.size() << std::endl;
     return freed;
 }
 
