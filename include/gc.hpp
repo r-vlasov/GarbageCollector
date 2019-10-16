@@ -247,11 +247,13 @@ template <class T, int size>
 Smart_ptr<T, size>::~Smart_ptr() {
     typename std::list<Info<T> >::iterator p;
     p = findInfoInList(addr);
+    pthread_mutex_lock(&mutex);
     if (p->getrefcount()) {
         p->decrefcount();
           
     }
     count--; 
+    pthread_mutex_unlock(&mutex);
     if (count == 0) {
         pthread_join(threadid, NULL);
         thread_init = false;
@@ -304,7 +306,7 @@ template <class T, int size>
 bool Smart_ptr<T, size>::running() {
     return (bool)count;
 }
-#include <unistd.h>
+
 template <class T, int size>
 bool Smart_ptr<T, size>::garbagecollect() {    
     typename std::list<Info<T> >::iterator p;
